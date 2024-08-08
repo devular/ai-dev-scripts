@@ -134,6 +134,7 @@ async function processCommit(answer) {
   Remember:
   - Do not include "Commit Message:" in your commit message. 
   - Take a guess as to why this code is being implemented (considering the user-provided context), and label it: Implementation reason:
+  - Incredibly important: Do not use "likely" or "probably" in your commit message or implimentation reason. Write authoritavely. If it is inaccurate the user will amend it of their own accord.
   
   Important:
   - The output will be piped directly into the commit message, so skip prose, introductions, and postscripts.
@@ -143,7 +144,7 @@ async function processCommit(answer) {
   try {
     const model =
       modelProvider === "openai"
-        ? openai("gpt-4")
+        ? openai("gpt-4o")
         : anthropic("claude-3-5-sonnet-20240620");
     const { text: message } = await generateText({
       model,

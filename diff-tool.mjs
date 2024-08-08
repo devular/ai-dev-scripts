@@ -172,8 +172,8 @@ async function main() {
         if (answer.toLowerCase() === "yes") {
           const escapedDescription = escape([prDescription]);
           const escapedTitle = escape([prTitle]);
-          const createPRCommand = `gh pr create --title '${escapedTitle}'
-           --body '${escapedDescription}' --web`;
+          const createPRCommand = `gh pr create --title ${escapedTitle}
+           --body ${escapedDescription} --web`;
 
           try {
             execSync(createPRCommand, { stdio: "inherit" });

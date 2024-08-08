@@ -173,10 +173,14 @@ async function main() {
           const escapedDescription = escape([prDescription]);
           const escapedTitle = escape([prTitle]);
           const createPRCommand = `gh pr create --title ${escapedTitle}
-           --body ${escapedDescription} --web`;
+           --body ${escapedDescription}`;
 
           try {
-            execSync(createPRCommand, { stdio: "inherit" });
+            const { stdout, stderr } = execSync(createPRCommand, {
+              stdio: "pipe",
+            });
+            if (stdout) console.log(stdout.toString());
+            if (stderr) console.error(stderr.toString());
             console.log("Pull request created successfully.");
           } catch (error) {
             console.error("Failed to create pull request:", error);

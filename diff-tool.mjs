@@ -1,34 +1,6 @@
 import { execSync } from "child_process";
-import { fileURLToPath } from "url";
-import { dirname, resolve } from "path";
-import { readFile, writeFile } from "fs/promises";
-import { anthropic } from "@ai-sdk/anthropic";
-import { openai } from "@ai-sdk/openai";
-import dotenv from "dotenv";
-import { generateText } from "ai";
-
-// Get the directory name of the current module
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-// Load environment variables from .env in the current working directory
-dotenv.config({ path: resolve(__dirname, ".env") });
-console.log("Loaded environment variables from current working directory");
-
-// Setup API credentials
-const anthropicKey = process.env["ANTHROPIC_API_KEY"];
-const openaiKey = process.env["OPENAI_API_KEY"];
-const modelProvider = process.env["MODEL_PROVIDER"] || "anthropic";
-
-if (modelProvider === "anthropic" && !anthropicKey) {
-  console.error("Please set the ANTHROPIC_API_KEY environment variable.");
-  process.exit(1);
-}
-
-if (modelProvider === "openai" && !openaiKey) {
-  console.error("Please set the OPENAI_API_KEY environment variable.");
-  process.exit(1);
-}
+import { readFile } from "fs/promises";
+import { generateTextWithModel } from "./utils.mjs";
 
 function getDiffFromMain(maxDiffSize = 1000) {
   console.log("Getting diff from main branch...");
@@ -101,11 +73,7 @@ async function generatePRDescription(diff, filesUnderMaxLength, readmeContent) {
     console.log(
       `Sending request to LLM API using model provider: ${modelProvider}...`
     );
-    const model =
-      modelProvider === "openai"
-        ? openai("gpt-4o")
-        : anthropic("claude-3-5-sonnet-20240620");
-    const { text: prDescription } = await generateText({
+    const { text: prDescription } = await generateTextWithModel({
       model,
       system: "You are a helpful assistant.",
       prompt,
@@ -176,11 +144,6 @@ async function main() {
 
     console.log("Generated PR Description:");
     console.log(prDescription);
-
-    // Optionally, you can save the PR description to a file
-    console.log("Saving PR description to file...");
-    await writeFile("pr_description.md", prDescription);
-    console.log("PR description saved to pr_description.md");
   } catch (error) {
     console.error("An error occurred:", error);
   }

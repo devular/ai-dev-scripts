@@ -34,7 +34,9 @@ export async function generateTextWithModel({
     modelProvider === "openai"
       ? openai("gpt-4o")
       : anthropic("claude-3-5-sonnet-20240620");
-
+  console.log(
+    `Sending request to LLM API using model provider: ${modelProvider}...`
+  );
   return generateText({
     model,
     system,

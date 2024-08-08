@@ -1,5 +1,6 @@
 import { execSync } from "child_process";
 import { readFile } from "fs/promises";
+import readline from "readline";
 import { generateTextWithModel } from "./utils.mjs";
 
 function getDiffFromMain(maxDiffSize = 1000) {
@@ -70,19 +71,28 @@ async function generatePRDescription(diff, filesUnderMaxLength, readmeContent) {
   console.log(`Length of string sent to LLM: ${prompt.length}`);
 
   try {
-    console.log(
-      `Sending request to LLM API using model provider: ${modelProvider}...`
-    );
     const { text: prDescription } = await generateTextWithModel({
-      model,
-      system: "You are a helpful assistant.",
       prompt,
     });
 
     console.log("PR description generated successfully");
-    return prDescription;
+
+    const titlePrompt = `
+      Based on the following PR description, generate a concise and informative title for the pull request:
+      ---
+      ${prDescription}
+      ---
+      Generate a PR title:
+    `;
+
+    const { text: prTitle } = await generateTextWithModel({
+      prompt: titlePrompt,
+    });
+
+    console.log("PR title generated successfully");
+    return { prDescription, prTitle };
   } catch (error) {
-    console.error("Error generating PR description:", error);
+    console.error("Error generating PR description or title:", error);
     return null;
   }
 }
@@ -132,18 +142,51 @@ async function main() {
     }
 
     console.log("Generating PR description...");
-    const prDescription = await generatePRDescription(
+    const prData = await generatePRDescription(
       diff,
       filesUnderMaxLength,
       readmeContent
     );
-    if (!prDescription) {
-      console.log("Failed to generate PR description.");
+    if (!prData) {
+      console.log("Failed to generate PR description and title.");
       return;
     }
 
+    const { prDescription, prTitle } = prData;
+
     console.log("Generated PR Description:");
     console.log(prDescription);
+
+    console.log("Generated PR Title:");
+    console.log(prTitle);
+
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    });
+
+    rl.question(
+      "Do you want to create this pull request on GitHub? (y/n) ",
+      (answer) => {
+        if (answer.toLowerCase() === "y") {
+          // Pipe the PR description into GitHub CLI to create a new PR
+          try {
+            execSync(
+              `gh pr create --title "${prTitle}" --body "${prDescription}"`,
+              {
+                cwd: process.cwd(),
+              }
+            );
+            console.log("Pull request created successfully.");
+          } catch (error) {
+            console.error("Error creating pull request:", error);
+          }
+        } else {
+          console.log("Pull request creation aborted.");
+        }
+        rl.close();
+      }
+    );
   } catch (error) {
     console.error("An error occurred:", error);
   }

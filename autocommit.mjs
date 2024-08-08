@@ -1,37 +1,11 @@
 import { execSync } from "child_process";
-import { fileURLToPath } from "url";
-import { dirname, resolve } from "path";
-import { readFileSync, existsSync } from "fs";
-import { generateText } from "ai";
-import { anthropic } from "@ai-sdk/anthropic";
-import { openai } from "@ai-sdk/openai";
+import { existsSync, readFileSync } from "fs";
+import { resolve } from "path";
 import readline from "readline";
-import dotenv from "dotenv";
 import shellEscape from "shell-escape";
-import yargs from "yargs/yargs";
 import { hideBin } from "yargs/helpers";
-
-// Get the directory name of the current module
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-// Load environment variables from .env.development.local
-dotenv.config({ path: resolve(__dirname, ".env") });
-
-// Setup API credentials
-const anthropicKey = process.env["ANTHROPIC_API_KEY"];
-const openaiKey = process.env["OPENAI_API_KEY"];
-const modelProvider = process.env["MODEL_PROVIDER"] || "anthropic";
-
-if (modelProvider === "anthropic" && !anthropicKey) {
-  console.error("Please set the ANTHROPIC_API_KEY environment variable.");
-  process.exit(1);
-}
-
-if (modelProvider === "openai" && !openaiKey) {
-  console.error("Please set the OPENAI_API_KEY environment variable.");
-  process.exit(1);
-}
+import yargs from "yargs/yargs";
+import { generateTextWithModel } from "./utils.mjs";
 
 const argv = yargs(hideBin(process.argv))
   .option("skip-context", {
@@ -142,13 +116,7 @@ async function processCommit(answer) {
   `;
 
   try {
-    const model =
-      modelProvider === "openai"
-        ? openai("gpt-4o")
-        : anthropic("claude-3-5-sonnet-20240620");
-    const { text: message } = await generateText({
-      model,
-      system: "You are a helpful assistant.",
+    const { text: message } = await generateTextWithModel({
       prompt: inputPrompt,
     });
 

@@ -177,7 +177,7 @@ async function main() {
 
           try {
             const { stdout, stderr } = execSync(createPRCommand, {
-              stdio: "pipe",
+              stdio: "inherit",
             });
             if (stdout) console.log(stdout.toString());
             if (stderr) console.error(stderr.toString());

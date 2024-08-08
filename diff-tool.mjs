@@ -1,3 +1,4 @@
+import escape from "shell-escape";
 import { execSync } from "child_process";
 import { readFile } from "fs/promises";
 import readline from "readline";
@@ -166,20 +167,21 @@ async function main() {
     });
 
     rl.question(
-      "Do you want to create this pull request on GitHub? (y/n) ",
-      (answer) => {
-        if (answer.toLowerCase() === "y") {
-          // Pipe the PR description into GitHub CLI to create a new PR
+      "Do you want to create a PR with GitHub PR tool? (yes/no) ",
+      async (answer) => {
+        if (answer.toLowerCase() === "yes") {
+          const escapedDescription = escape([
+            prDescription.replace(/`/g, "\\`"),
+          ]);
+          const escapedTitle = escape([prTitle.replace(/`/g, "\\`")]);
+          const createPRCommand = `gh pr create --title '${escapedTitle}
+           --body '${escapedDescription}' --web`;
+
           try {
-            execSync(
-              `gh pr create --title "${prTitle}" --body "${prDescription}"`,
-              {
-                cwd: process.cwd(),
-              }
-            );
+            execSync(createPRCommand, { stdio: "inherit" });
             console.log("Pull request created successfully.");
           } catch (error) {
-            console.error("Error creating pull request:", error);
+            console.error("Failed to create pull request:", error);
           }
         } else {
           console.log("Pull request creation aborted.");

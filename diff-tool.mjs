@@ -170,10 +170,8 @@ async function main() {
       "Do you want to create a PR with GitHub PR tool? (yes/no) ",
       async (answer) => {
         if (answer.toLowerCase() === "yes") {
-          const escapedDescription = escape([
-            prDescription.replace(/`/g, "\\`"),
-          ]);
-          const escapedTitle = escape([prTitle.replace(/`/g, "\\`")]);
+          const escapedDescription = escape([prDescription]);
+          const escapedTitle = escape([prTitle]);
           const createPRCommand = `gh pr create --title '${escapedTitle}
            --body '${escapedDescription}' --web`;
 

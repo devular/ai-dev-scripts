@@ -1,4 +1,4 @@
-# Git Automation Tools
+# AI poweredGit Automation Tools
 
 This repository contains two powerful Git automation tools: `diff-tool.mjs` and `autocommit.mjs`. These tools help streamline your Git workflow by generating pull request descriptions and automating commit messages.
 
@@ -7,7 +7,7 @@ This repository contains two powerful Git automation tools: `diff-tool.mjs` and 
 1. Clone the repository to your local machine:
 
    ```sh
-   git clone git@github.com:devular/ai-dev-scripts.git
+   git clone ssh://git@github.com:devular/ai-dev-scripts.git
    cd ai-dev-scripts
    ```
 

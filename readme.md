@@ -1,4 +1,4 @@
-# AI poweredGit Automation Tools
+# AI-powered Git Automation Tools
 
 This repository contains two powerful Git automation tools: `diff-tool.mjs` and `autocommit.mjs`. These tools help streamline your Git workflow by generating pull request descriptions and automating commit messages.
 

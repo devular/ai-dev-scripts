@@ -72,6 +72,14 @@ To use the autocommit tool:
 3. Follow the prompts to provide a short description of your changes.
 4. The tool will generate a commit message following the Conventional Commits format.
 
+Example of a conventional commit:
+
+```sh
+feat(auth): add login functionality
+
+Added login functionality to the authentication module. This includes user session management and validation.
+```
+
 Options:
 
 - `--skip-context` or `-s`: Skip inputting extra context for the prompt.
@@ -87,6 +95,7 @@ To use the diff tool for generating pull request descriptions:
    difftool
    ```
 3. The tool will generate a pull request description based on the differences between your current branch and the main branch.
+4. The tool will then run the generated pull request description through AI again to generate a concise and informative PR title.
 
 ## Contributing
 

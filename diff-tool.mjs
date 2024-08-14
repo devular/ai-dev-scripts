@@ -7,7 +7,7 @@ import { generateTextWithModel } from "./utils.mjs";
 function getDiffFromMain(maxDiffSize = 1000) {
   console.log("Getting diff from main branch...");
   const diffCommand = `
-    git diff main --name-only | grep -vE 'package-lock.json|yarn.lock|pnpm-lock.yaml|public/.*\\.(css|js)|\\.min\\.' | while read file; do
+    git diff main --name-only | grep -vE 'package-lock.json|yarn.lock|pnpm-lock.yaml|public/.*\\.(css|js)|\\.min\\.|^\\.yarn/' | while read file; do
       echo "File: $file";
       git diff main -- "$file" | awk -v max=${maxDiffSize} '
         NR <= max {print} 
@@ -160,37 +160,6 @@ async function main() {
 
     console.log("Generated PR Title:");
     console.log(prTitle);
-
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    });
-
-    rl.question(
-      "Do you want to create a PR with GitHub PR tool? (yes/no) ",
-      async (answer) => {
-        if (answer.toLowerCase() === "yes") {
-          const escapedDescription = escape([prDescription]);
-          const escapedTitle = escape([prTitle]);
-          const createPRCommand = `gh pr create --title ${escapedTitle}
-           --body ${escapedDescription}`;
-
-          try {
-            const { stdout, stderr } = execSync(createPRCommand, {
-              stdio: "inherit",
-            });
-            if (stdout) console.log(stdout.toString());
-            if (stderr) console.error(stderr.toString());
-            console.log("Pull request created successfully.");
-          } catch (error) {
-            console.error("Failed to create pull request:", error);
-          }
-        } else {
-          console.log("Pull request creation aborted.");
-        }
-        rl.close();
-      }
-    );
   } catch (error) {
     console.error("An error occurred:", error);
   }

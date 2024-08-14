@@ -27,7 +27,7 @@ try {
   process.exit(1);
 }
 const diff = execSync(
-  "git diff --staged ':(exclude)package-lock.json' ':(exclude)yarn.lock' ':(exclude)pnpm-lock.yaml'",
+  "git diff --staged ':(exclude)package-lock.json' ':(exclude)yarn.lock' ':(exclude)pnpm-lock.yaml' ':(exclude)dist/**' ':(exclude).yarn/plugins/**'",
   {
     cwd: process.cwd(),
   }
